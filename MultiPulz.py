@@ -6,6 +6,7 @@ from tweepy import OAuthHandler
 import datetime, time
 from twitter_credentials import consumer_key, consumer_secret, access_token, access_token_secret
 import csv
+from textblob import TextBlob
 
 #Authenticate Twitter; Return API object. 
 class TwitterAuthenticator():
@@ -36,6 +37,16 @@ class FileOps():
 # Download tweets
 class PullTweets():
     
+    # def sentiment(self, text):
+    #     if TextBlob(text).sentiment == 0:
+    #         print("Neutral")
+        
+    #     elif TextBlob(text).sentiment > 0:
+    #         print("Positive")
+
+    #     elif TextBlob(text).sentiment < 0:
+    #         print("Negative")
+
     def get_tweets(self, screen_name): 
 
         print("downloading tweets ...")
@@ -51,12 +62,14 @@ class PullTweets():
             oldest_id = tweets[-1].id
             print(f"{len(tweets)} tweets downloaded ...")
 
-        out_tweets = [[tweet.id_str, tweet.created_at, tweet.text.encode("utf-8")] for tweet in tweets]
+        out_tweets = [[tweet.id_str, tweet.created_at, tweet.text.encode("utf-8"), self.sentiment(tweet.text)] for tweet in tweets]
         
         with open(f'{screen_name} tweets.csv', 'w') as f:
             writer = csv.writer(f)
-            writer.writerow(["id","created_at","text"])
+            writer.writerow(["id","created_at","text","sentiment"])
             writer.writerows(out_tweets)
+
+
 
     def all_tweets(self):
         
